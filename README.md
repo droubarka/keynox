@@ -4,6 +4,7 @@
 
 ## We're on this journey together
 We care about your experience and hope you're enjoying your new vault.
+<br/>
 [what should we work on next?](https://github.com/droubarka/keynox/issues/new)
 
 ## Contributing
