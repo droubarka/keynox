@@ -2,6 +2,7 @@
 [![Last Commit](https://img.shields.io/github/last-commit/droubarka/keynox)]()
 
 # KEYNOX
+![Screenshot](/images/screenshot-20240917-173435.png)
 
 ## We're on this journey together
 We care about your experience and hope you're enjoying your new vault.
