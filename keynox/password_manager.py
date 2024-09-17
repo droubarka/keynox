@@ -1,14 +1,6 @@
 
 from vault import Vault
 
-entry = {
-	"category": "Social Networking sites for Programmers"
-	"url":      "https://github.com",
-	"username": "droubarka",
-	"password": "!password"
-	"name":     "MY GITHUB ACCOUNT"
-	"notes":    "last-update: Tue Sep 17 17:21:00 EDT 2024"
-}
 
 class PasswordManager:
 	def __init__(self, vault: Vault) -> None:
@@ -22,5 +14,15 @@ class PasswordManager:
 
 	def get_entry(self, key: str, value: str) -> dict:
 		for entry in self.entries:
-			if entry.get(key) == value:
-				return entry
+			if key in entry.keys():
+				if entry[key] == value:
+					return entry
+		return None
+
+	def get_entry_list(self, key: str, value: str) -> list:
+		list = []
+		for entry in self.entries:
+			if key in entry.keys():
+				if entry[key] == value:
+					list.append(entry)
+		return list
