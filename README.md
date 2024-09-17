@@ -1,9 +1,7 @@
 [![Status: In Development](https://img.shields.io/badge/Status-In%20Development-blue)]()
+[![Last Commit](https://img.shields.io/github/last-commit/droubarka/keynox)]()
 
 # KEYNOX
-<div align="center">
-	<img alt="keynox-logo" src="https://github.com/droubarka/keynox/blob/main/keynox/cli/keynox-logo.ascii.png"/>
-</div>
 
 ## We're on this journey together
 We care about your experience and hope you're enjoying your new vault.
