@@ -17,4 +17,7 @@ We care about your experience and hope you're enjoying your new vault.
 ## Contributing
 Contributions are welcome! If you'd like to contribute, please fork the repository and submit a pull request.
 
+## License
+**Keynox** is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+
 [![Buy me a coffee!](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/droubarka)
