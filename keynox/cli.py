@@ -17,6 +17,8 @@ def show_error(errorlevel: int, *args, **kwargs) -> int:
 	elif errorlevel == 200:
 		sleep(0.1)
 		print(f"{redcode}[!] `{kwargs['filename']}` file not found. Please try again.\n", file=sys.stderr)
+	else:
+		input("XXX")
 	print(defcode, end='')
 	return 0
 
@@ -59,20 +61,25 @@ def menu() -> None:
 		elif level == 1:
 			try:
 				filename = input("Enter file in which to save the vault: ")
+
 				if os.path.isfile(filename):
 					show_error(100, filename=filename)
+
 					choice = input("Overwrite (y/N)? ")
 					if choice.lower() in ("y", "yes"):
-						errorlevel = 3
+						errorlevel = 2
 				else:
-					errorlevel = 3
+					errorlevel = 2
 
-				if errorlevel == 3:
+				if errorlevel == 2:
+					vault = Vault(filename); vault.store(data=[])
 					errorlevel = 0
-					level = -1
-					pass
+					level = 3
 			except KeyboardInterrupt:
 				level = 0
+			except:
+				show_error(-1024)
+				pass
 		elif level == 2:
 			try:
 				if errorlevel == 1:
@@ -80,15 +87,21 @@ def menu() -> None:
 
 				filename = input("Enter the file of the vault to import: ")
 				if os.path.isfile(filename):
-					level = -1
-					pass
+					vault = Vault(filename); vault.retrieve()
+					level = 3
 				else:
 					errorlevel = 1
 			except KeyboardInterrupt:
 				level = 0
+			except:
+				show_error(-1024)
+				pass
 		elif level == 3:
-			level = -1
-			pass
+			try:
+				input("what's next? ")
+				level = -1
+			except:
+				pass
 		elif level == -1:
 			input("[!] not finished yet.")
 			pass
