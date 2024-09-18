@@ -1,5 +1,6 @@
 [![Status: In Development](https://img.shields.io/badge/Status-In%20Development-blue)]()
 [![Last Commit](https://img.shields.io/github/last-commit/droubarka/keynox)]()
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 <div align="center">
 	<img alt="screenshot" src="/images/screenshot-20240917-173435.png" />
