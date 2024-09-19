@@ -33,7 +33,7 @@ def menu() -> None:
 				# Re-raise KeyboardInterrupt exception
 				raise
 			except Exception as error:
-				show_error(-99, **globals())
+				show_error(-99, error=error, **globals())
 
 		# level-1: Create a new vault
 		elif level == 1:
@@ -74,7 +74,7 @@ def menu() -> None:
 			except IsADirectoryError:
 				errorlevel = 203
 			except Exception as error:
-				show_error(-99, **globals())
+				show_error(-99, error=error, **globals())
 
 		# level-2: Import a vault
 		elif level == 2:
@@ -102,15 +102,28 @@ def menu() -> None:
 			except IsADirectoryError:
 				errorlevel = 203
 			except Exception as error:
-				show_error(-99, **globals())
+				show_error(-99, error=error, **globals())
 
 		# level-3: Next step (not implemented)
 		elif level == 3:
 			try:
-				input("what's next? ")
-				level = -1
-			except:
+				if errorlevel == 100:
+					errorlevel = show_error(errorlevel)
+
+				choice = input("> ")
+
+				if choice == "1":
+					level = -1
+				elif choice in ("2", "3", "4"):
+					level = -1
+				else:
+					# Set error level to 100 if invalid choice
+					errorlevel = 100
+
+			except KeyboardInterrupt as error:
 				pass
+			except Exception as error:
+				show_error(-99, error=error, **globals())
 
 		# blackhole: Not finished yet
 		elif level == -1:
