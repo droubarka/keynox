@@ -5,56 +5,11 @@ from time import sleep
 
 from vault import Vault
 
-CLEAR = "cls" if os.name == "nt" else "clear"
-defcode, redcode = '\033[0m', '\033[91m'
-
-def show_error(errorlevel: int, **args) -> int:
-
-	print(f"{redcode}", end='', file=sys.stderr)
-
-	# level-0
-	if errorlevel == 100:
-		print("[!] Invalid option. Please try again.", file=sys.stderr)
-
-	# level-1
-	elif errorlevel == 200:
-		print("\n[!] The file already exists.", file=sys.stderr)
-	elif errorlevel == 201:
-		print("[!] FileNotFoundError: `{file}`".format(file=args["filename"]), file=sys.stderr)
-	elif errorlevel == 202:
-		print("[!] PermissionError: `{file}`".format(file=args["filename"]), file=sys.stderr)
-	elif errorlevel == 203:
-		print("[!] IsADirectoryError: `{file}`".format(file=args["filename"]), file=sys.stderr)
-
-	# level-2
-	elif errorlevel == 300:
-		printf("", file=sys.stderr)
-
-	# level-x
-	if errorlevel == -99:
-		input("XError: ???")
-
-	print(defcode, file=sys.stderr)
-	sleep(0.1)
-	return 0
-
-def show_logo() -> None:
-	# Displays the Keynox logo
-	with open('./cli/keynox-logo.ascii') as file:
-		print(file.read())
-
-def show_menu(level: int) -> None:
-	os.system(CLEAR); show_logo()
-	# Displays the menu at the specified level
-	with open(f'./cli/menu/menu-{level}.x') as file:
-		print(file.read())
-
 def menu() -> None:
-	level = 0
-	errorlevel = 0
-	choice = str()
-	filename = str()
+	level = errorlevel = 0
+	choice = filename = str()
 	vault = Vault(filename)
+
 	while True:
 		show_menu(level)
 
@@ -161,6 +116,47 @@ def menu() -> None:
 		elif level == -1:
 			input("[!] not finished yet.")
 			pass
+
+def show_error(errorlevel: int, **args) -> None:
+
+	defcode, redcode = '\033[0m', '\033[91m'
+
+	print(f"{redcode}", end='', file=sys.stderr)
+
+	if errorlevel == -99:
+		input("XError: ???")
+
+	elif errorlevel == 100:
+		print("[!] Invalid option. Please try again.", file=sys.stderr)
+	elif errorlevel == 200:
+		print(file=sys.stderr)
+		print("[!] The file already exists.", file=sys.stderr)
+	elif errorlevel == 201:
+		print("[!] FileNotFoundError: `{file}`".format(file=args["filename"]), file=sys.stderr)
+	elif errorlevel == 202:
+		print("[!] PermissionError: `{file}`".format(file=args["filename"]), file=sys.stderr)
+	elif errorlevel == 203:
+		print("[!] IsADirectoryError: `{file}`".format(file=args["filename"]), file=sys.stderr)
+
+	sleep(0.1)
+	print(defcode, file=sys.stderr)
+
+def show_logo() -> None:
+	# Displays the Keynox logo
+	with open('./cli/keynox-logo.ascii') as file:
+		print(file.read())
+
+def show_menu(level: int) -> None:
+	# Clear the terminal screen
+	os.system("cls" if os.name == "nt" else "clear")
+	# Displays the Keynox logo
+	show_logo()
+	# Displays the menu at the specified level
+	try:
+		with open(f'./cli/menu/menu-{level}.x') as file:
+			print(file.read())
+	except Exception:
+		pass
 
 def main():
 	try:
