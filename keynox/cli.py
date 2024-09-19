@@ -58,6 +58,7 @@ def menu() -> None:
 	while True:
 		show_menu(level)
 
+		# level-0: Main menu
 		if level == 0:
 			try:
 				if errorlevel == 100:
@@ -70,13 +71,16 @@ def menu() -> None:
 				elif choice.lower() in ("0", "exit", "quit"):
 					break
 				else:
+					# Set error level to 100 if invalid choice
 					errorlevel = 100
 
 			except KeyboardInterrupt:
+				# Re-raise KeyboardInterrupt exception
 				raise
 			except Exception as error:
 				show_error(-99, **globals())
 
+		# level-1: Create a new vault
 		elif level == 1:
 			try:
 				if errorlevel in (201, 202, 203):
@@ -86,6 +90,7 @@ def menu() -> None:
 
 				if os.path.isfile(filename):
 
+					# Show error message if file exists
 					show_error(200, filename=filename)
 
 					choice = input("Overwrite (y/N)? ")
@@ -94,8 +99,10 @@ def menu() -> None:
 						errorlevel = 10
 
 				else:
+					# Set error level to 10 if file does not exist
 					errorlevel = 10
 
+				# Create a new vault if file does not exist
 				if errorlevel == 10:
 					vault = Vault(filename)
 					vault.store(data=[])
@@ -103,6 +110,7 @@ def menu() -> None:
 					errorlevel = 0
 
 			except KeyboardInterrupt:
+				# Go back to main menu if user interrupts
 				level = 0
 			except FileNotFoundError:
 				errorlevel = 201
@@ -113,6 +121,7 @@ def menu() -> None:
 			except Exception as error:
 				show_error(-99, **globals())
 
+		# level-2: Import a vault
 		elif level == 2:
 			try:
 				if errorlevel in (201, 202, 203):
@@ -125,9 +134,11 @@ def menu() -> None:
 					vault.retrieve()
 					level = 3
 				else:
+					# Try to open the file (this will raise an exception)
 					open(filename)
 
 			except KeyboardInterrupt:
+				# Go back to main menu if user interrupts
 				level = 0
 			except FileNotFoundError:
 				errorlevel = 201
@@ -138,12 +149,15 @@ def menu() -> None:
 			except Exception as error:
 				show_error(-99, **globals())
 
+		# level-3: Next step (not implemented)
 		elif level == 3:
 			try:
 				input("what's next? ")
 				level = -1
 			except:
 				pass
+
+		# blackhole: Not finished yet
 		elif level == -1:
 			input("[!] not finished yet.")
 			pass
