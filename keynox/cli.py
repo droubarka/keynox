@@ -5,7 +5,58 @@ from time import sleep
 
 from vault import Vault
 
+def level_0() -> tuple:
+	try:
+		choice = input("> ")
+
+		if choice in ("1", "2"):
+			level = int(choice)
+		elif choice.lower() in ("0", "exit", "quit"):
+			raise KeyboardInterrupt
+		else:
+			# Set error level to 100 if invalid choice
+			errorlevel = 100
+
+	except KeyboardInterrupt:
+		raise
+	except Exception as error:
+		show_error(-99, error=error) #?
+	finally:
+		return errorlevel, level
+
+
 def menu() -> None:
+	errorlevel = 0
+	level = 0
+	while True:
+		if errorlevel in (100,):
+			errorlevel = show_error(errorlevel)
+
+		try:
+			if level == 0:
+				errorlevel, level = level_0()
+
+			else:
+				raise KeyboardInterrupt
+
+		except KeyboardInterrupt:
+			raise
+		except Exception as error:
+			show_error(-99, error=error) #?
+
+def main():
+	try:
+		menu()
+	except KeyboardInterrupt:
+		print("\n#? Exiting ...")
+	except Exception as error:
+		show_error(-99, error=error) #?
+
+if __name__ == "__main__": main()
+
+
+
+def _menu() -> None:
 	level = errorlevel = 0
 	choice = filename = str()
 	vault = Vault(filename)
@@ -14,26 +65,7 @@ def menu() -> None:
 		show_menu(level)
 
 		# level-0: Main menu
-		if level == 0:
-			try:
-				if errorlevel == 100:
-					errorlevel = show_error(errorlevel)
-
-				choice = input("> ")
-
-				if choice in ("1", "2"):
-					level = int(choice)
-				elif choice.lower() in ("0", "exit", "quit"):
-					break
-				else:
-					# Set error level to 100 if invalid choice
-					errorlevel = 100
-
-			except KeyboardInterrupt:
-				# Re-raise KeyboardInterrupt exception
-				raise
-			except Exception as error:
-				show_error(-99, error=error, **globals())
+		if level == 0: pass
 
 		# level-1: Create a new vault
 		elif level == 1:
@@ -171,10 +203,3 @@ def show_menu(level: int) -> None:
 	except Exception:
 		pass
 
-def main():
-	try:
-		menu()
-	except KeyboardInterrupt:
-		print()
-
-if __name__ == "__main__": main()
