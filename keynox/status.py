@@ -1,19 +1,28 @@
 
 import sys
 
-def show_error(errorlevel: int, **argv):
+from time import sleep
+
+def show_error(errorlevel: int, **args) -> int:
 	defcode, redcode = '\033[0m', '\033[91m' #?
 
-	print(f"{redcode}[!] ", end='', file=sys.stderr)
+	print("{}[!] ".format(redcode), end='', file=sys.stderr)
 
 	if errorlevel == -99:
-		input("#? XError: ???")
+		print("#? XError: {}".format(args["error"]), file=sys.stderr)
+		sys.exit(1)
 
 	elif errorlevel == 400:
-		print(f"Invalid choice: {args['choice']}", file=sys.stderr)
+		print("Invalid choice.", file=sys.stderr)
 	elif errorlevel == 401:
-		print(f"PermissionError: {args['filename']}", file=sys.stderr)
+		print("PermissionError: {}".format(args["filename"]), file=sys.stderr)
 	elif errorlevel == 402:
-		print(f"IsADirectoryError: {args['filename']}", file=sys.stderr)
+		print("IsADirectoryError: {}".format(args["filename"]), file=sys.stderr)
 	elif errorlevel == 403:
-		print(f"Already exists: {args['filename']}", file=sys.stderr)
+		print("Already exists: {}".format(args["filename"]), file=sys.stderr)
+	elif errorlevel == 404:
+		print("FileNotFoundError: {}".format(args["filename"]), file=sys.stderr)
+
+	sleep(0.1)
+	print(defcode, file=sys.stderr)
+	return 200

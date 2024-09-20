@@ -4,47 +4,55 @@ import os, sys
 from time import sleep
 
 from vault import Vault
+from status import show_error
 
 
-def show_error(errorlevel: int, **args) -> None:
+def level_3(vault: Vault) -> tuple:
+	#? Next step (not implemented)
+	errorlevel = 200
+	level = 3
+	try:
+		choice = input("> ")
 
-	defcode, redcode = '\033[0m', '\033[91m' #?
+		if choice == "1":
+			level = 0 #?
 
-	print(f"{redcode}", end='', file=sys.stderr)
+		elif choice in ("2", "3", "4"):
+			level = 0 #?
+		else:
+			errorlevel = 400
 
-	if errorlevel == -99:
-		input("#? XError: ???")
-
-	elif errorlevel == 400:
-		print("[!] Invalid option. Please try again.", file=sys.stderr)
-	elif errorlevel == :
-		print("[]", file=sys.stderr)
-
-	sleep(0.1)
-	print(defcode, file=sys.stderr)
+	except KeyboardInterrupt:
+		level = 0 #?
+	except Exception as error:
+		show_error(-99, error=error) #?
 
 
-def new_vault(filename: str) -> Vault:
+	return errorlevel, level
+
+
+def open_vault(filename: str) -> Vault:
 	vault = Vault(filename)
-	vault.store(data=[])
+	vault.retrieve()
+
 	return vault
 
-def level_1() -> tuple:
+def level_2() -> tuple:
+	#! Import a vault
 	errorlevel = 200
-	level = 1
+	level = 2
+	filename = None
+	vault = None
 	try:
-		filename = input("Enter file in which to save the vault: ")
+		filename = input("Enter the file of the vault to import: ")
 
 		if os.path.isfile(filename):
-			show_error(403, filename=filename)
-
-			choice = input("Overwrite (y/N)? ")
-
-			if choice.lower() in ("y", "yes"):
-				new_vault()
+			vault = open_vault(filename)
+			level = 3
 
 		else:
-			new_vault()
+			# Try to open the file (this will raise an exception)
+			open(filename).close()
 
 	except KeyboardInterrupt:
 		level = 0
@@ -57,10 +65,54 @@ def level_1() -> tuple:
 	except Exception as error:
 		show_error(-99, error=error) #?
 
-	return errorlevel, level
+	return errorlevel, level, filename, vault
+
+
+def new_vault(filename: str) -> Vault:
+	vault = Vault(filename)
+	vault.store(data=[])
+
+	return vault
+
+def level_1() -> tuple:
+	#! Create a new vault
+	errorlevel = 200
+	level = 1
+	filename = None
+	vault = None
+	try:
+		filename = input("Enter file in which to save the vault: ")
+
+		if os.path.isfile(filename):
+			# Show error message if file already exists
+			show_error(403, filename=filename)
+
+			choice = input("Overwrite (y/N)? ")
+
+			if choice.lower() in ("y", "yes"):
+				vault = new_vault(filename)
+				level = 3
+
+		else:
+			vault = new_vault(filename)
+			level = 3
+
+	except KeyboardInterrupt:
+		level = 0
+	except PermissionError:
+		errorlevel = 401
+	except IsADirectoryError:
+		errorlevel = 402
+	except FileNotFoundError:
+		errorlevel = 404
+	except Exception as error:
+		show_error(-99, error=error) #?
+
+	return errorlevel, level, filename, vault
 
 
 def level_0() -> tuple:
+	#! Main menu
 	errorlevel = 200
 	level = 0
 	try:
@@ -82,10 +134,10 @@ def level_0() -> tuple:
 
 
 def menu() -> None:
-	errorlevel = 0
+	errorlevel = 200
 	level = 0
-	choice = None
 	filename = None
+	vault = None
 	while True:
 		# Clear the terminal screen
 		os.system("cls" if os.name == "nt" else "clear")
@@ -95,6 +147,10 @@ def menu() -> None:
 			with open('./cli/keynox-logo.ascii') as file:
 				print(file.read())
 
+		except FileNotFoundError:
+			Ellipsis
+
+		try:
 			# Displays the menu at the specified level
 			with open(f'./cli/menu/menu-{level}.x') as file:
 				print(file.read())
@@ -103,7 +159,7 @@ def menu() -> None:
 			Ellipsis
 
 		if errorlevel in (400,):
-			errorlevel = show_error(errorlevel, choice=choice)
+			errorlevel = show_error(errorlevel)
 
 		if errorlevel in (401, 402, 403, 404):
 			errorlevel = show_error(errorlevel, filename=filename)
@@ -112,9 +168,13 @@ def menu() -> None:
 			if level == 0:
 				errorlevel, level = level_0()
 			elif level == 1:
-				errorlevel, level = level_1()
+				errorlevel, level, filename, vault = level_1()
+			elif level == 2:
+				errorlevel, level, filename, vault = level_2()
+			elif level == 3:
+				errorlevel, level = level_3(vault)
 			else:
-				raise KeyboardInterrupt
+				raise KeyboardInterrupt #?
 
 		except KeyboardInterrupt:
 			raise
@@ -128,6 +188,7 @@ def main():
 
 	except KeyboardInterrupt:
 		print("\n#? Exiting ...")
+		sys.exit(0)
 	except Exception as error:
 		show_error(-99, error=error) #?
 
