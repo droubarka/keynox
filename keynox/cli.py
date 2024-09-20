@@ -25,7 +25,7 @@ def level_3(vault: Vault) -> tuple:
 	except KeyboardInterrupt:
 		level = 0 #?
 	except Exception as error:
-		show_error(-99, error=error) #?
+		show_error(-99, error=error) #? Handle unexpected errors
 
 
 	return errorlevel, level
@@ -63,7 +63,7 @@ def import_vault() -> tuple:
 	except FileNotFoundError:
 		errorlevel = 404
 	except Exception as error:
-		show_error(-99, error=error) #?
+		show_error(-99, error=error) #? Handle unexpected errors
 
 	return errorlevel, level, filename, vault
 
@@ -105,7 +105,7 @@ def create_vault() -> tuple:
 	except FileNotFoundError:
 		errorlevel = 404
 	except Exception as error:
-		show_error(-99, error=error) #?
+		show_error(-99, error=error) #? Handle unexpected errors
 
 	return errorlevel, level, filename, vault
 
@@ -121,12 +121,13 @@ def main_menu() -> tuple:
 		elif choice.lower() in ("0", "exit", "quit"):
 			raise KeyboardInterrupt
 		else:
+			# Invalid choice
 			errorlevel = 400
 
 	except KeyboardInterrupt:
 		raise
 	except Exception as error:
-		show_error(-99, error=error) #?
+		show_error(-99, error=error) #? Handle unexpected errors
 
 	return errorlevel, level
 
@@ -163,6 +164,7 @@ def menu() -> None:
 			errorlevel = show_error(errorlevel, filename=filename)
 
 		try:
+			# Handle different levels of the menu
 			if level == 0:
 				errorlevel, level = main_menu()
 			elif level == 1:
@@ -177,7 +179,7 @@ def menu() -> None:
 		except KeyboardInterrupt:
 			raise
 		except Exception as error:
-			show_error(-99, error=error) #?
+			show_error(-99, error=error) #? Handle unexpected errors
 
 
 def main():
@@ -188,7 +190,7 @@ def main():
 		print("\n#? Exiting ...")
 		sys.exit(0)
 	except Exception as error:
-		show_error(-99, error=error) #?
+		show_error(-99, error=error) #? Handle unexpected errors
 
 
 if __name__ == "__main__": main()
