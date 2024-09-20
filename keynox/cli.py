@@ -37,7 +37,7 @@ def open_vault(filename: str) -> Vault:
 
 	return vault
 
-def level_2() -> tuple:
+def import_vault() -> tuple:
 	#! Import a vault
 	errorlevel = 200
 	level = 2
@@ -74,8 +74,7 @@ def new_vault(filename: str) -> Vault:
 
 	return vault
 
-def level_1() -> tuple:
-	#! Create a new vault
+def create_vault() -> tuple:
 	errorlevel = 200
 	level = 1
 	filename = None
@@ -111,8 +110,7 @@ def level_1() -> tuple:
 	return errorlevel, level, filename, vault
 
 
-def level_0() -> tuple:
-	#! Main menu
+def main_menu() -> tuple:
 	errorlevel = 200
 	level = 0
 	try:
@@ -166,11 +164,11 @@ def menu() -> None:
 
 		try:
 			if level == 0:
-				errorlevel, level = level_0()
+				errorlevel, level = main_menu()
 			elif level == 1:
-				errorlevel, level, filename, vault = level_1()
+				errorlevel, level, filename, vault = create_vault()
 			elif level == 2:
-				errorlevel, level, filename, vault = level_2()
+				errorlevel, level, filename, vault = import_vault()
 			elif level == 3:
 				errorlevel, level = level_3(vault)
 			else:
