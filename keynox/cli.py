@@ -1,27 +1,37 @@
 
 import os, sys
 
-from time import sleep
+from getpass import getpass
+from time import sleep, strftime
 from vault import Vault
 from status import show_error
 from password_manager import PasswordManager
+from utils import generate_password as genpass
 
 
 def add_entry(pm: PasswordManager) -> None:
 	entry = {"data": {}, "meta": {}}
 
-	# data
+	choice = input("Generate password randomly (Y/n)? ")
+
+	if choice.lower() in ("n", "no"):
+		password = getpass("password: ") #?
+
+	else:
+		policy = {"digit": 1, "lowercase": 1, "uppercase": 1, "special": 1}
+		password = genpass(32, policy)
+
 	entry["data"] = {
-		"category" : input("category: "),
 		"url"      : input("url: "),
 		"username" : input("username: "),
-		"password" : input("password: "),
+		"password" : password,
 		"name"     : input("name: "),
+		"category" : input("category: "),
 		"notes"    : input("notes: ")
 	}
 
 	# meta
-	entry["meta"]["last-update"] = time.strftime("%a %b %d %H:%M:%S %Z %Y")
+	entry["meta"]["last-update"] = strftime("%a %b %d %H:%M:%S %Z %Y")
 
 	pm.add_entry(entry)
 
@@ -34,7 +44,8 @@ def level_3(vault: Vault) -> tuple:
 		choice = input("> ")
 
 		if choice == "1":
-			level = 0 #?
+			add_entry(pm)
+			pm.vault.store(pm.entries) #?
 
 		elif choice in ("2", "3", "4"):
 			level = 0 #?
