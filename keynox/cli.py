@@ -2,15 +2,34 @@
 import os, sys
 
 from time import sleep
-
 from vault import Vault
 from status import show_error
+from password_manager import PasswordManager
 
+
+def add_entry(pm: PasswordManager) -> None:
+	entry = {"data": {}, "meta": {}}
+
+	# data
+	entry["data"] = {
+		"category" = input("category: "),
+		"url" = input("url: "),
+		"username" = input("username: "),
+		"password" = input("password: "),
+		"name" = input("name: "),
+		"notes" = input("notes: ")
+	}
+
+	# meta
+	entry["meta"]["last-update"] = time.strftime("%a %b %d %H:%M:%S %Z %Y")
+
+	pm.add_entry(entry)
 
 def level_3(vault: Vault) -> tuple:
 	#? Next step (not implemented)
 	errorlevel = 200
 	level = 3
+	pm = PasswordManager(vault)
 	try:
 		choice = input("> ")
 
