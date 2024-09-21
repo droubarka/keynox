@@ -14,15 +14,15 @@ class PasswordManager:
 
 	def get_entry(self, key: str, value: str) -> dict:
 		for entry in self.entries:
-			if key in entry.keys():
-				if entry[key] == value:
+			if key in entry["data"].keys():
+				if entry["data"][key] == value:
 					return entry
 		return None
 
 	def get_entry_list(self, key: str, value: str) -> list:
 		list = []
 		for entry in self.entries:
-			if key in entry.keys():
-				if entry[key] == value:
+			if key in entry["data"].keys():
+				if entry["data"][key] == value:
 					list.append(entry)
 		return list
