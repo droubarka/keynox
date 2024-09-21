@@ -162,7 +162,7 @@ def menu() -> None:
 
 		try:
 			# Displays the Keynox logo
-			with open('./cli/keynox-logo.ascii') as file:
+			with open('./cli/keynox-logo.dat') as file:
 				print(file.read())
 
 		except FileNotFoundError:
@@ -170,7 +170,7 @@ def menu() -> None:
 
 		try:
 			# Displays the menu at the specified level
-			with open(f'./cli/menu/menu-{level}.x') as file:
+			with open(f'./cli/menu/menu-lvl-{level}.dat') as file:
 				print(file.read())
 
 		except FileNotFoundError:
