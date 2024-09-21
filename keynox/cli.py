@@ -12,12 +12,12 @@ def add_entry(pm: PasswordManager) -> None:
 
 	# data
 	entry["data"] = {
-		"category" = input("category: "),
-		"url" = input("url: "),
-		"username" = input("username: "),
-		"password" = input("password: "),
-		"name" = input("name: "),
-		"notes" = input("notes: ")
+		"category" : input("category: "),
+		"url"      : input("url: "),
+		"username" : input("username: "),
+		"password" : input("password: "),
+		"name"     : input("name: "),
+		"notes"    : input("notes: ")
 	}
 
 	# meta
