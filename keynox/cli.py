@@ -42,7 +42,7 @@ def display_error_message(*args) -> None:
 		404: 'FileNotFoundError'
 	}
 
-	sys.stderr.write("[!] {}".format(error_lookup[errorlevel]))
+	sys.stderr.write(error_lookup[errorlevel])
 
 	if args:
 		sys.stderr.write(": {}".format(*args)) #?
@@ -50,7 +50,7 @@ def display_error_message(*args) -> None:
 	sys.stderr.write("\n")
 
 
-def handle_error() -> None:
+def handle_error() -> None: #?
 	"""
 	Handles error levels and displays appropriate error messages.
 	"""
@@ -64,6 +64,7 @@ def handle_error() -> None:
 		print()
 
 	sys.stderr.write(f"{redcode}")
+	sys.stderr.write("[!] ")
 	display_error_message(error)
 	sys.stderr.write(f"{defcode}")
 	print()
@@ -108,13 +109,19 @@ def display_menu() -> None: #?
 		try:
 			if level == 0:
 				main_menu()
+
 			elif level == 1:
 				pass
+
 			else:
 				pass
 
 		except KeyboardInterrupt:
+			if level == 0:
+				sys.exit(0)
+
 			pass
+
 		except Exception as error:
 			pass
 
