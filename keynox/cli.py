@@ -47,6 +47,7 @@ def display_error_message() -> None:
 	sys.stderr.write(error_lookup[errorlevel])
 
 	if error != None:
+
 		sys.stderr.write(": {}".format(error))
 
 	sys.stderr.write("\n")
@@ -141,6 +142,46 @@ def create_vault_menu() -> None:
 		level = 0
 
 
+def open_vault(filename: str) -> Vault:
+	"""
+	Opens an existing vault from the given filename.
+	"""
+
+	global error
+
+	try:
+		vault = Vault(filename)
+		vault.retrieve()
+
+	except:
+		error = filename
+		raise
+
+	return vault
+
+
+def import_vault_menu() -> None:
+	"""
+	Provides a menu for importing an existing vault.
+	"""
+
+	global error, level, vault
+
+	try:
+		filename = input("Enter the file of the vault to import: ")
+
+		if os.path.isfile(filename):
+			vault = open_vault(filename)
+			level = 3
+
+		else:
+			# Try to open the file (this will raise an exception)
+			open(error:=filename).close()
+
+	except KeyboardInterrupt:
+		level = 0
+
+
 #! Un/Stable code
 
 
@@ -165,10 +206,10 @@ def display_menu() -> None: #?
 				create_vault_menu()
 
 			elif level == 2:
-				pass
+				import_vault_menu()
 
 			elif level == 3:
-				input()
+				input("not finished yet.")
 				pass
 
 			else:
