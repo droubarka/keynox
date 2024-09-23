@@ -5,6 +5,8 @@ import time
 
 from io import open
 
+from vault import Vault
+
 
 KEYNOX_LOGO_FILEPATH = './cli/keynox-logo.dat'
 MENU_FILEPATH_FORMAT = './cli/menu/lvl-{}.dat'
@@ -28,7 +30,7 @@ def render_logo_and_menu() -> None:
 	except FileNotFoundError: Ellipsis
 
 
-def display_error_message(*args) -> None:
+def display_error_message() -> None:
 	"""
 	Displays an error message based on the given error level.
 	"""
@@ -44,13 +46,13 @@ def display_error_message(*args) -> None:
 
 	sys.stderr.write(error_lookup[errorlevel])
 
-	if args:
-		sys.stderr.write(": {}".format(*args)) #?
+	if error != None:
+		sys.stderr.write(": {}".format(error))
 
 	sys.stderr.write("\n")
 
 
-def handle_error() -> None: #?
+def handle_error(*args: None, **kwargs: None) -> None: #?
 	"""
 	Handles error levels and displays appropriate error messages.
 	"""
@@ -63,11 +65,13 @@ def handle_error() -> None: #?
 	if errorlevel == 403:
 		print()
 
-	sys.stderr.write(f"{redcode}")
-	sys.stderr.write("[!] ")
-	display_error_message(error)
+	sys.stderr.write(f"{redcode}[!] ")
+
+	display_error_message()
+
 	sys.stderr.write(f"{defcode}")
 	print()
+
 	time.sleep(0.1)
 
 	error, errorlevel = None, 200
@@ -89,13 +93,60 @@ def main_menu() -> None:
 		sys.exit(0)
 
 	else:
-		error, errorlevel = choice, 400 #: InvalidOption
+		error, errorlevel = f"'{choice}'", 400 #: InvalidOption
+
+
+def new_vault(filename: str) -> Vault:
+	"""
+	Creates a new vault with the given filename.
+	"""
+
+	global error
+
+	try:
+		vault = Vault(filename)
+		vault.store(data=[])
+
+	except:
+		error = filename
+		raise
+
+	return vault
+
+
+def create_vault_menu() -> None:
+	"""
+	Display the create vault menu for creating a new vault.
+	"""
+
+	global error, level, errorlevel, vault
+
+	try:
+		filename = input("Enter file in which to save the vault: ")
+
+		if os.path.isfile(filename):
+			handle_error(error:=filename, errorlevel:=403) #: FileAlreadyExists
+
+			choice = input("Overwrite (y/N)? ")
+
+			if choice.lower() in ("y", "yes"):
+				vault = new_vault(filename)
+				level = 3
+
+		else:
+			vault = new_vault(filename)
+			level = 3
+
+	except KeyboardInterrupt:
+		level = 0
 
 
 #! Un/Stable code
 
 
 def display_menu() -> None: #?
+
+	global error, errorlevel
 
 	while True:
 
@@ -111,6 +162,13 @@ def display_menu() -> None: #?
 				main_menu()
 
 			elif level == 1:
+				create_vault_menu()
+
+			elif level == 2:
+				pass
+
+			elif level == 3:
+				input()
 				pass
 
 			else:
@@ -122,9 +180,17 @@ def display_menu() -> None: #?
 
 			pass
 
+		except PermissionError:
+			errorlevel = 401
+		except IsADirectoryError:
+			errorlevel = 402
+		except FileNotFoundError:
+			errorlevel = 404
 		except Exception as error:
-			pass
+			error, errorlevel = error, -1 #: XError
 
+
+#~ ctrl-keys
 
 #! Un/Stable code
 
@@ -132,6 +198,8 @@ error = None
 
 level = 0
 errorlevel = 200
+
+vault = None
 
 def main() -> int:
 	"""
