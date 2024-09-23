@@ -4,7 +4,7 @@ import string
 from secrets import choice, SystemRandom
 
 
-def generate_password(length: int, policy: dict) -> str:
+def genpass(length: int, policy: dict) -> str:
 
 	if length < sum(policy.values()):
 		raise ValueError("Length must be greater than or equal to the sum of policy values.")

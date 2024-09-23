@@ -3,8 +3,11 @@ import os
 import sys
 import time
 
+from getpass import getpass
 from io import open
 
+from password_manager import PasswordManager
+from utils import genpass
 from vault import Vault
 
 
@@ -120,7 +123,7 @@ def create_vault_menu() -> None:
 	Display the create vault menu for creating a new vault.
 	"""
 
-	global error, level, errorlevel, vault
+	global error, level, errorlevel, vault, password_manager
 
 	try:
 		filename = input("Enter file in which to save the vault: ")
@@ -132,10 +135,12 @@ def create_vault_menu() -> None:
 
 			if choice.lower() in ("y", "yes"):
 				vault = new_vault(filename)
+				password_manager = PasswordManager(vault)
 				level = 3
 
 		else:
 			vault = new_vault(filename)
+			password_manager = PasswordManager(vault)
 			level = 3
 
 	except KeyboardInterrupt:
@@ -165,13 +170,14 @@ def import_vault_menu() -> None:
 	Provides a menu for importing an existing vault.
 	"""
 
-	global error, level, vault
+	global error, level, vault, password_manager
 
 	try:
 		filename = input("Enter the file of the vault to import: ")
 
 		if os.path.isfile(filename):
 			vault = open_vault(filename)
+			password_manager = PasswordManager(vault)
 			level = 3
 
 		else:
@@ -183,6 +189,64 @@ def import_vault_menu() -> None:
 
 
 #! Un/Stable code
+
+
+def create_entry() -> dict:
+	"""
+	Creates a new entry for a password manager.
+	"""
+
+	entry = {"data": dict(), "meta": dict()}
+
+	choice = input("Generate password randomly (Y/n)? ")
+
+	if choice.lower() in ("n", "no"):
+		password = getpass("password: ")
+
+	else:
+		policy = {"digit": 1, "lowercase": 1, "uppercase": 1, "special": 1}
+		password = genpass(32, policy)
+
+	entry["data"] = {
+		"username": input("username: "),
+		"url"     : input("url     : "),
+		"name"    : input("name    : "),
+		"category": input("category: ")
+	}
+
+	notes = []
+
+	while user_note := input("notes   : "):
+		notes.append(user_note)
+
+	entry["data"]["notes"] = "\n".join(notes)
+	entry["data"]["password"] = password
+	entry["meta"]["last-update"] = time.strftime("%a %b %H:%M:%S %Z %Y")
+
+	return entry
+
+
+def level_3() -> None:
+
+	global error, errorlevel
+
+	try:
+		choice = input("> ")
+
+		if choice == "1":
+			entry = create_entry()
+
+		else:
+			error, errorlevel = f"'{choice}'", 400
+
+
+	except KeyboardInterrupt:
+		password_manager.add_entry(entry)
+		vault.store(data=password_manager.entries)
+		sys.exit(1) #?
+
+	except:
+		pass
 
 
 def display_menu() -> None: #?
@@ -209,17 +273,14 @@ def display_menu() -> None: #?
 				import_vault_menu()
 
 			elif level == 3:
-				input("not finished yet.")
+				level_3()
 				pass
 
 			else:
 				pass
 
 		except KeyboardInterrupt:
-			if level == 0:
-				sys.exit(0)
-
-			pass
+			sys.exit(0) #?
 
 		except PermissionError:
 			errorlevel = 401
@@ -227,6 +288,8 @@ def display_menu() -> None: #?
 			errorlevel = 402
 		except FileNotFoundError:
 			errorlevel = 404
+		except SystemExit:
+			raise
 		except Exception as error:
 			error, errorlevel = error, -1 #: XError
 
@@ -241,6 +304,7 @@ level = 0
 errorlevel = 200
 
 vault = None
+password_manager = None
 
 def main() -> int:
 	"""
