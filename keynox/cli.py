@@ -26,6 +26,9 @@ def render_logo_and_menu() -> None:
 
 	except FileNotFoundError: Ellipsis
 
+	if vault != None:
+		print(f"\t    Vault: {vault}\n") #?
+
 	try:
 		with open(MENU_FILEPATH_FORMAT.format(level)) as file:
 			print(file.read())
@@ -111,8 +114,8 @@ def new_vault(filename: str) -> Vault:
 		vault = Vault(filename)
 		vault.store(data=[])
 
-	except (PermissionError, IsADirectoryError):
-		error = filename
+	except (PermissionError, IsADirectoryError, FileNotFoundError):
+		error = f"'{filename}'"
 		raise
 
 	except Exception as xerr: #? pass
@@ -161,7 +164,7 @@ def open_vault(filename: str) -> Vault:
 		vault.retrieve()
 
 	except PermissionError:
-		error = filename
+		error = f"'{filename}'"
 		raise
 
 	except Exception as xerr: #? pass
@@ -188,9 +191,9 @@ def import_vault_menu() -> None:
 		level = 3
 
 	else:
+		error = f"'{filename}'"
 		# Try to open the file (this will raise an exception)
-		open(error:=filename).close()
-
+		open(filename).close()
 
 #! Un/Stable code
 
@@ -203,6 +206,7 @@ def create_entry() -> dict:
 	entry = {"data": dict(), "meta": dict()}
 
 	choice = input("Generate password randomly (Y/n)? ")
+	print()
 
 	if choice.lower() in ("n", "no"):
 		password = getpass("password: ")
@@ -231,6 +235,8 @@ def create_entry() -> dict:
 
 
 def level_3() -> None:
+	"""
+	"""
 
 	global error, errorlevel
 
@@ -239,18 +245,17 @@ def level_3() -> None:
 
 		if choice == "1":
 			entry = create_entry()
+			choice = input("\nSave to password manager (Y/n)? ")
+			if choice.lower() not in ("n", "no"):
+				password_manager.add_entry(entry)
+			pass
 
 		else:
-			error, errorlevel = f"'{choice}'", 400
+			error, errorlevel = f"'{choice}'", 400 #: FileAlreadyExists
 
-
-	except KeyboardInterrupt:
-		password_manager.add_entry(entry)
-		vault.store(data=password_manager.entries)
-		sys.exit(1) #?
-
-	except:
-		pass
+	except KeyboardInterrupt: #?
+		input("\nARE YOU SURE YOU WANT TO EXIT (Y/n:=Ctrl+C)? ")
+		sys.exit(1)
 
 
 def display_menu() -> None: #?
@@ -294,14 +299,15 @@ def display_menu() -> None: #?
 		except EOFError:
 			input("catched") #?
 
+		except SystemExit:
+			raise
+
 		except PermissionError:
 			errorlevel = 401
 		except IsADirectoryError:
 			errorlevel = 402
 		except FileNotFoundError:
 			errorlevel = 404
-		except SystemExit:
-			raise
 		except Exception as xerr:
 			handle_error(error:=xerr, errorlevel:=-1)
 			sys.exit(1)
