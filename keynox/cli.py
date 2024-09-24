@@ -105,15 +105,21 @@ def new_vault(filename: str) -> Vault:
 	Creates a new vault with the given filename.
 	"""
 
-	global error
+	global error, errorlevel
 
 	try:
 		vault = Vault(filename)
 		vault.store(data=[])
 
-	except Exception:
+	except (PermissionError, IsADirectoryError):
 		error = filename
 		raise
+
+	except Exception as xerr: #? pass
+		handle_error(
+				error:=f"Failed to create vault in {filename}: {xerr}",
+				errorlevel:=-1)
+		sys.exit(1)
 
 	return vault
 
@@ -140,7 +146,6 @@ def create_vault_menu() -> None:
 	else:
 		vault = new_vault(filename)
 		password_manager = PasswordManager(vault)
-
 		level = 3
 
 
@@ -149,15 +154,21 @@ def open_vault(filename: str) -> Vault:
 	Opens an existing vault from the given filename.
 	"""
 
-	global error
+	global error, errorlevel
 
 	try:
 		vault = Vault(filename)
 		vault.retrieve()
 
-	except:
+	except PermissionError:
 		error = filename
 		raise
+
+	except Exception as xerr: #? pass
+		handle_error(
+				error:=f"Failed to import vault in {filename}: {xerr}",
+				errorlevel:=-1)
+		sys.exit(1)
 
 	return vault
 
@@ -169,20 +180,16 @@ def import_vault_menu() -> None:
 
 	global error, level, vault, password_manager
 
-	try:
-		filename = input("Enter the file of the vault to import: ")
+	filename = input("Enter the file of the vault to import: ")
 
-		if os.path.isfile(filename):
-			vault = open_vault(filename)
-			password_manager = PasswordManager(vault)
-			level = 3
+	if os.path.isfile(filename):
+		vault = open_vault(filename)
+		password_manager = PasswordManager(vault)
+		level = 3
 
-		else:
-			# Try to open the file (this will raise an exception)
-			open(error:=filename).close()
-
-	except KeyboardInterrupt:
-		level = 0
+	else:
+		# Try to open the file (this will raise an exception)
+		open(error:=filename).close()
 
 
 #! Un/Stable code
@@ -248,7 +255,7 @@ def level_3() -> None:
 
 def display_menu() -> None: #?
 
-	global error, errorlevel
+	global error, errorlevel, level
 
 	while True:
 
@@ -277,9 +284,16 @@ def display_menu() -> None: #?
 				pass
 
 		except KeyboardInterrupt:
-			sys.exit(0) #?
+			if level == 0:
+				sys.exit(0)
+			elif level in (1, 2):
+				level = 0
+			else:
+				pass
+
 		except EOFError:
-			input("catched")
+			input("catched") #?
+
 		except PermissionError:
 			errorlevel = 401
 		except IsADirectoryError:
@@ -288,9 +302,9 @@ def display_menu() -> None: #?
 			errorlevel = 404
 		except SystemExit:
 			raise
-		except Exception as error:
-			error, errorlevel = error, -1 #: XError
-
+		except Exception as xerr:
+			handle_error(error:=xerr, errorlevel:=-1)
+			sys.exit(1)
 
 #~ ctrl-keys
 
