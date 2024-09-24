@@ -111,7 +111,7 @@ def new_vault(filename: str) -> Vault:
 		vault = Vault(filename)
 		vault.store(data=[])
 
-	except:
+	except Exception:
 		error = filename
 		raise
 
@@ -125,26 +125,23 @@ def create_vault_menu() -> None:
 
 	global error, level, errorlevel, vault, password_manager
 
-	try:
-		filename = input("Enter file in which to save the vault: ")
+	filename = input("Enter file in which to save the vault: ")
 
-		if os.path.isfile(filename):
-			handle_error(error:=filename, errorlevel:=403) #: FileAlreadyExists
+	if os.path.isfile(filename):
+		handle_error(error:=filename, errorlevel:=403) #: FileAlreadyExists
 
-			choice = input("Overwrite (y/N)? ")
+		choice = input("Overwrite (y/N)? ")
 
-			if choice.lower() in ("y", "yes"):
-				vault = new_vault(filename)
-				password_manager = PasswordManager(vault)
-				level = 3
-
-		else:
+		if choice.lower() in ("y", "yes"):
 			vault = new_vault(filename)
 			password_manager = PasswordManager(vault)
 			level = 3
 
-	except KeyboardInterrupt:
-		level = 0
+	else:
+		vault = new_vault(filename)
+		password_manager = PasswordManager(vault)
+
+		level = 3
 
 
 def open_vault(filename: str) -> Vault:
@@ -281,7 +278,8 @@ def display_menu() -> None: #?
 
 		except KeyboardInterrupt:
 			sys.exit(0) #?
-
+		except EOFError:
+			input("catched")
 		except PermissionError:
 			errorlevel = 401
 		except IsADirectoryError:
