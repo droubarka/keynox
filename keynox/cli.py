@@ -265,7 +265,6 @@ def password_manager_menu() -> None:
 			error, errorlevel = f"'{choice}'", 400 #: FileAlreadyExists
 
 	except KeyboardInterrupt: #?
-		input("\nARE YOU SURE YOU WANT TO EXIT (Y/n:=Ctrl+C)? ")
 		sys.exit(1)
 
 
