@@ -195,8 +195,6 @@ def import_vault_menu() -> None:
 		# Try to open the file (this will raise an exception)
 		open(filename).close()
 
-#! Un/Stable code
-
 
 def create_entry() -> dict:
 	"""
@@ -209,23 +207,30 @@ def create_entry() -> dict:
 	print()
 
 	if choice.lower() in ("n", "no"):
-		password = getpass("password: ")
+		password = getpass("Password : ")
 
 	else:
-		policy = {"digit": 1, "lowercase": 1, "uppercase": 1, "special": 1}
-		password = genpass(32, policy)
+		policy = {"digit": 1, "lowercase": 1, "uppercase": 1, "special": 1} #?
+		password = genpass(32, policy) #?
 
 	entry["data"] = {
-		"username": input("username: "),
-		"url"     : input("url     : "),
-		"name"    : input("name    : "),
-		"category": input("category: ")
+		"username": input("Username : "),
+		"url"     : input("URL      : "),
+		"name"    : input("Name     : "),
+		"category": input("Category : ")
 	}
+
+	print("\nLet's take some notes!")
+	print("Enter your notes (press 'Ctrl+D' to finish):\n") #?
 
 	notes = []
 
-	while user_note := input("notes   : "):
-		notes.append(user_note)
+	while True:
+		try:
+			user_note = input("Add note : ")
+		except EOFError:
+			print()
+			break
 
 	entry["data"]["notes"] = "\n".join(notes)
 	entry["data"]["password"] = password
@@ -234,20 +239,28 @@ def create_entry() -> dict:
 	return entry
 
 
-def level_3() -> None:
+#! Un/Stable code
+
+
+def password_manager_menu() -> None:
 	"""
+	Displays the password manager menu, allowing user to modify the vault.
 	"""
 
 	global error, errorlevel
 
 	try:
 		choice = input("> ")
+		print() #?
 
 		if choice == "1":
 			entry = create_entry()
 			choice = input("\nSave to password manager (Y/n)? ")
 			if choice.lower() not in ("n", "no"):
 				password_manager.add_entry(entry)
+			pass #? is_saved
+
+		elif
 			pass
 
 		else:
