@@ -260,8 +260,6 @@ def password_manager_menu() -> None:
 				password_manager.add_entry(entry)
 			pass #? is_saved
 
-		elif
-			pass
 
 		else:
 			error, errorlevel = f"'{choice}'", 400 #: FileAlreadyExists
@@ -295,7 +293,7 @@ def display_menu() -> None: #?
 				import_vault_menu()
 
 			elif level == 3:
-				level_3()
+				password_manager_menu()
 				pass
 
 			else:
