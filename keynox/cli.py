@@ -111,7 +111,9 @@ def new_vault(filename: str) -> Vault:
 	global error, errorlevel
 
 	try:
-		vault = Vault(filename)
+		master_password = getpass("Master Password: ")
+
+		vault = Vault(filename, master_password)
 		vault.store(data=[])
 
 	except (PermissionError, IsADirectoryError, FileNotFoundError):
@@ -160,7 +162,9 @@ def open_vault(filename: str) -> Vault:
 	global error, errorlevel
 
 	try:
-		vault = Vault(filename)
+		master_password = getpass("Master Password: ")
+
+		vault = Vault(filename, master_password)
 		vault.retrieve()
 
 	except PermissionError:
