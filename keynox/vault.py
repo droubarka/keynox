@@ -6,12 +6,14 @@ import secrets
 
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives.kdf.scrypt import Scrypt
+from io import open
 
 
 class Vault:
 	"""
 	A simple encrypted data vault.
 	"""
+
 	def __init__(self, filename: str, master_password: str) -> None:
 		"""
 		Initializes the Vault object with a filename and a master password.
