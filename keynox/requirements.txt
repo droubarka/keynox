@@ -1,1 +1,2 @@
-cryptography>=3.4.8
+# pathlib (Python 3.4+)
+cryptography
