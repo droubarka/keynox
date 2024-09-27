@@ -1,2 +1,1 @@
-# pathlib (Python 3.4+)
 cryptography
