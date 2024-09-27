@@ -5,7 +5,8 @@
 		"url"        : "https://github.com/login",
 		"username"   : "my-github-username",
 		"password"   : "mY#G!thUb%P@$$w0rD",
-		"notes"      : "This is a note about my GitHub account.\n"},
+		"notes"      : "This is a note about my GitHub account.\n"
+	},
 
 	"meta": {
 		"last-update": "Fri Sep 20 18:55:27 EDT 2024"
