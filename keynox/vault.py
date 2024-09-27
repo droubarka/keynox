@@ -1,7 +1,6 @@
 
 import base64
 import json
-import pathlib
 import secrets
 
 from cryptography.fernet import Fernet
@@ -19,7 +18,7 @@ class Vault:
 		Initializes the Vault object with a filename and a master password.
 		"""
 		self.filename = filename
-		self.filename_salt = pathlib.Path(filename).with_suffix('.salt')
+		self.filename_salt = f"{filename}.salt"
 		self.master_password = master_password
 
 
