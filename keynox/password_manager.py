@@ -1,6 +1,7 @@
 
-from vault import Vault
+import hashlib
 
+from vault import Vault
 
 class PasswordManager:
 	"""
@@ -13,6 +14,27 @@ class PasswordManager:
 		"""
 		self.vault = vault
 		self.entries = vault.retrieve()
+		self.update_sync_fingerprint()
+
+
+	def calculate_sync_fingerprint(self) -> bytes:
+		"""
+		Calculates the sync fingerprint based on the current entries.
+		"""
+		sync_fingerprint = hashlib.sha256(
+			str(
+				sorted(self.entries.items())
+			).encode()
+		).digest()
+
+		return sync_fingerprint
+
+
+	def update_sync_fingerprint(self) -> None:
+		"""
+		Updates the internal sync fingerprint to match the current entries.
+		"""
+		self.sync_fingerprint = self.calculate_sync_fingerprint()
 
 
 	def add_entry(self, entry: dict) -> None:
@@ -36,11 +58,12 @@ class PasswordManager:
 		self.remove_entry(self.entries[index])
 
 
-	def update_vault(self) -> None:
+	def sync_vault(self) -> None:
 		"""
-		Saves the current entries to the vault.
+		Syncs the vault with the internal state of the PasswordManager object.
 		"""
 		self.vault.store(data=self.entries)
+		self.update_sync_fingerprint()
 
 
 	def get_entry(self, key: str, value: str) -> dict:
