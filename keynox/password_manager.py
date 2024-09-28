@@ -29,6 +29,13 @@ class PasswordManager:
 		self.entries.remove(entry)
 
 
+	def remove_entry_by_index(self, index: int) -> None:
+		"""
+		Removes an entry from the list by its index.
+		"""
+		self.remove_entry(self.entries[index])
+
+
 	def update_vault(self) -> None:
 		"""
 		Saves the current entries to the vault.
