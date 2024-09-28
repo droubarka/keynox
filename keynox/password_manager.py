@@ -21,11 +21,8 @@ class PasswordManager:
 		"""
 		Calculates the sync fingerprint based on the current entries.
 		"""
-		sync_fingerprint = hashlib.sha256(
-			str(
-				sorted(self.entries.items())
-			).encode()
-		).digest()
+		entries = [str(sorted(entry.items())) for entry in self.entries]
+		sync_fingerprint = hashlib.sha256(''.join(entries).encode()).digest()
 
 		return sync_fingerprint
 
