@@ -9,7 +9,11 @@ import os
 import sys
 
 from colorama import Fore
+from getpass import getpass
 from io import open
+
+from password_manager import PasswordManager
+from vault import Vault
 
 
 KEYNOX_LOGO_FILEPATH = './cli/keynox-logo.dat'
@@ -32,7 +36,10 @@ def render_logo_and_menu(level: int=None) -> None:
 	except Exception: Ellipsis
 
 	if password_manager != None:
-		pass
+		print(f"\tVault: {password_manager.vault.filename}")
+		print(f"\tEntries: {len(password_manager.entries)}", end=' ')
+		print(f"| Synchronized: {password_manager.is_sync()}")
+		print()
 
 	try:
 		if level != None:
@@ -72,10 +79,51 @@ def main_menu() -> int:
 		raise ValueError(f"Invalid choice: '{choice}'")
 
 
+def new_vault(filename: str) -> Vault:
+	"""
+	Creates a new vault with given filename.
+	"""
+
+	# Check if the file can be created
+	open(filename, 'w').close()
+
+	master_password = getpass("Master Password: ")
+
+	vault = Vault(filename, master_password)
+	vault.store(data=[])
+
+	return vault
+
+
+def create_vault_menu() -> PasswordManager:
+	"""
+	Displays the create vault menu for creating a new vault.
+	"""
+
+	filename = input("Enter file in which to save the vault: ")
+
+	if os.path.isfile(filename):
+		print()
+		display_error_message(
+			FileExistsError(f"[Errno 17] file exists: '{filename}'"))
+
+		choice = input("Overwrite (y/N)? ")
+
+		if choice.lower() in ("y", "yes"):
+			return PasswordManager(new_vault(filename))
+
+	else:
+		return PasswordManager(new_vault(filename))
+
+	return None
+
+
 def display_menu() -> None:
 	"""
 	Displays the menu and manages user interactions.
 	"""
+
+	global password_manager
 
 	level = 0
 	error = None
@@ -93,8 +141,27 @@ def display_menu() -> None:
 			except ValueError as xerr:
 				error = xerr
 
+			except EOFError:
+				pass
+
 			except KeyboardInterrupt:
 				sys.exit(0)
+
+		elif level == 1:
+			try:
+				password_manager = create_vault_menu()
+
+				if password_manager != None:
+					level = 3
+
+			except EOFError:
+				pass
+
+			except KeyboardInterrupt:
+				level = 0
+
+			except Exception as xerr:
+				error = xerr
 
 		else:
 			sys.exit(0)
