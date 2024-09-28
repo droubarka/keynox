@@ -3,10 +3,10 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 <div align="center">
-	<img alt="screenshot" src="/images/screenshot-20240917-173435.png" />
+	<img alt="screenshot" src="images/screenshot-20240928-190040.png" />
 </div>
 
-# KEYNOX
+# Keynox
 **Keynox** was created to provide a **secure** and **easy-to-use** solution for managing passwords. I built **Keynox** as a personal project to strengthen my skills in **cryptography** and **secure coding practices**, and to provide a useful tool for others who value **simplicity** and **security**.
 
 ## We're on this journey together
