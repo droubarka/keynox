@@ -128,6 +128,36 @@ def create_vault_menu() -> PasswordManager:
 	return None
 
 
+def open_vault(filename: str) -> Vault:
+	"""
+	Opens an existing vault from the given filename.
+	"""
+
+	# Check if the file can be read
+	open(filename, 'r').close()
+
+	master_password = getpass("Master Password: ")
+
+	vault = Vault(filename, master_password)
+	#~ vault.retrieve()
+
+	return vault
+
+
+def import_vault_menu() -> PasswordManager:
+	"""
+	Provides an menu for importing an existing vault.
+	"""
+
+	filename = input("Enter the file of the vault to import: ")
+
+	if os.path.isfile(filename):
+		return PasswordManager(open_vault(filename))
+
+	# Try to open the file (this will raise an exception)
+	open(filename).close()
+
+
 def display_menu() -> None:
 	"""
 	Displays the menu and manages user interactions.
@@ -157,12 +187,29 @@ def display_menu() -> None:
 			except KeyboardInterrupt:
 				sys.exit(0)
 
+			except Exception as xerr:
+				error = xerr
+
 		elif level == 1:
 			try:
 				password_manager = create_vault_menu()
 
 				if password_manager != None:
 					level = 3
+
+			except EOFError:
+				pass
+
+			except KeyboardInterrupt:
+				level = 0
+
+			except Exception as xerr:
+				error = xerr
+
+		elif level == 2:
+			try:
+				password_manager = import_vault_menu()
+				level = 3
 
 			except EOFError:
 				pass
