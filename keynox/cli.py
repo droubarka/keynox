@@ -36,9 +36,19 @@ def render_logo_and_menu(level: int=None) -> None:
 	except Exception: Ellipsis
 
 	if password_manager != None:
-		print(f"\tVault: {password_manager.vault.filename}")
-		print(f"\tEntries: {len(password_manager.entries)}", end=' ')
-		print(f"| Synchronized: {password_manager.is_sync()}")
+		print("\tVault: {}{}{}".format(
+				Fore.LIGHTYELLOW_EX,
+				password_manager.vault.filename,
+				Fore.RESET))
+		print("\tEntries: {}{}{}".format(
+				Fore.CYAN,
+				len(password_manager.entries),
+				Fore.RESET), end=' ')
+		is_sync = password_manager.is_sync()
+		print("| Synchronized: {}{}{}".format(
+			[Fore.LIGHTRED_EX, Fore.LIGHTGREEN_EX][is_sync],
+			is_sync,
+			Fore.RESET))
 		print()
 
 	try:
@@ -54,7 +64,7 @@ def display_error_message(error: Exception) -> None:
 	Displays an error message.
 	"""
 
-	sys.stderr.write(Fore.RED)
+	sys.stderr.write(Fore.LIGHTRED_EX)
 	sys.stderr.write(f"[!] {type(error).__name__}: {error}\n")
 	sys.stderr.write(Fore.RESET)
 	print()
