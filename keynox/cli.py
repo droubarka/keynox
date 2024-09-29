@@ -7,12 +7,14 @@ This program provides a command-line interface for managing passwords.
 
 import os
 import sys
+import time
 
 from colorama import Fore
 from getpass import getpass
 from io import open
 
 from password_manager import PasswordManager
+from utils import genpass
 from vault import Vault
 
 
@@ -158,6 +160,66 @@ def import_vault_menu() -> PasswordManager:
 	open(filename).close()
 
 
+def create_entry() -> dict:
+	"""
+	Creates a new password entry.
+	"""
+
+	entry = {'data': {}, 'meta': {}}
+
+	choice = input("Generate password randomly (Y/n)? ")
+	print()
+
+	if choice.lower() in ("n", "no"):
+		password = getpass("Password : ")
+
+	else:
+		policy = {'digit': 1, 'lowercase': 1, 'uppercase': 1, 'special': 1} #?
+		password = genpass(32, policy) #?
+
+	entry['data'] = {
+		'username': input("Username : "),
+		'url'     : input("URL      : "),
+		'name'    : input("Name     : "),
+		'category': input("Category : "),
+		'password': password
+	}
+
+	print("\nLet's take some notes!")
+	print("Enter your notes (press 'Ctrl+D' to finish):\n") #?
+
+	notes = []
+	while True:
+		try:
+			notes.append(input("Add note : "))
+		except EOFError:
+			print()
+			break
+
+	entry['data']['notes'] = "\n".join(notes)
+	entry['meta']['last-update'] = time.strftime("%a %b %H:%M:%S %Z %Y")
+
+	return entry
+
+
+def password_manager_menu() -> None:
+	"""
+	Displays the password manager menu, allowing user to modify the vault.
+	"""
+
+	choice = input("> ")
+	print()
+
+	if choice == "1":
+		entry = create_entry()
+		choice = input("\nSave to password manager (Y/n)? ")
+		if choice.lower() not in ("n", "no"):
+			password_manager.add_entry(entry)
+
+	else:
+		raise ValueError(f"Invalid choice: '{choice}'")
+
+
 def display_menu() -> None:
 	"""
 	Displays the menu and manages user interactions.
@@ -177,9 +239,6 @@ def display_menu() -> None:
 		if level == 0:
 			try:
 				level = main_menu()
-
-			except ValueError as xerr:
-				error = xerr
 
 			except EOFError:
 				pass
@@ -216,6 +275,19 @@ def display_menu() -> None:
 
 			except KeyboardInterrupt:
 				level = 0
+
+			except Exception as xerr:
+				error = xerr
+
+		elif level == 3:
+			try:
+				password_manager_menu()
+
+			except EOFError:
+				pass
+
+			except KeyboardInterrupt:
+				pass
 
 			except Exception as xerr:
 				error = xerr
