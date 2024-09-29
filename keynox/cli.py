@@ -10,6 +10,7 @@ import sys
 import time
 
 from colorama import Fore
+from cryptography.fernet import InvalidToken
 from getpass import getpass
 from io import open
 
@@ -154,7 +155,14 @@ def import_vault_menu() -> PasswordManager:
 	filename = input("Enter the file of the vault to import: ")
 
 	if os.path.isfile(filename):
-		return PasswordManager(open_vault(filename))
+		try:
+			return PasswordManager(open_vault(filename))
+
+		except InvalidToken as error:
+			if not error.args:
+				error.args = ("Token is invalid or corrupted",)
+
+			raise InvalidToken(error)
 
 	# Try to open the file (this will raise an exception)
 	open(filename).close()
