@@ -10,13 +10,14 @@ import sys
 import time
 
 from colorama import Fore
-from cryptography.fernet import InvalidToken
 from getpass import getpass
 from io import open
+from rich.console import Console
+from rich.table import Table
 
 from password_manager import PasswordManager
 from utils import genpass
-from vault import Vault
+from vault import Vault, InvalidToken
 
 
 KEYNOX_LOGO_FILEPATH = './cli/keynox-logo.dat'
@@ -210,6 +211,63 @@ def create_entry() -> dict:
 	return entry
 
 
+def pause() -> None:
+	"""
+	Pauses the program execution and waits for the Enter key press.
+	"""
+
+	getpass("\nPress Enter to continue ... ")
+
+
+def show_entries() -> None:
+	"""
+	Displays password manager entries.
+	"""
+
+	console = Console()
+
+	len_entries = len(password_manager.entries)
+
+	if not len_entries:
+		print("No entries found.")
+		pause()
+
+	rows_per_page = 32 #?
+	index = 0
+
+	while index < len_entries:
+		os.system('cls' if os.name == 'nt' else 'clear')
+
+		table = Table(title=f"Password Manager Entries\n", box=None)
+
+		table.add_column("ID", justify="right", no_wrap=True)
+		table.add_column("Category")
+		table.add_column("Name")
+		table.add_column("Username")
+		table.add_column("URL")
+		table.add_column("Note", no_wrap=True)
+
+		for id in range(index, min(index + rows_per_page, len_entries)):
+			entry = password_manager.entries[id]
+			table.add_row(
+				str(id),
+				entry['data']['category']             or 'N/A',
+				entry['data']['name']                 or 'N/A',
+				entry['data']['username']             or 'N/A',
+				entry['data']['url']                  or 'N/A',
+				entry['data']['notes'].split("\n")[0] or 'N/A',
+			)
+
+		console.print(table)
+
+		#! This raises an exception when using 'console.print(table)'
+		#! IndexError: list index out of range
+		#~ table.rows.clear()
+
+		pause()
+		index += rows_per_page
+
+
 def password_manager_menu() -> None:
 	"""
 	Displays the password manager menu, allowing user to modify the vault.
@@ -223,6 +281,13 @@ def password_manager_menu() -> None:
 		choice = input("\nSave to password manager (Y/n)? ")
 		if choice.lower() not in ("n", "no"):
 			password_manager.add_entry(entry)
+
+	elif choice == "2":
+		show_entries()
+
+	elif choice == "0": #?
+		print("Sync the vault ...")
+		password_manager.sync_vault()
 
 	else:
 		raise ValueError(f"Invalid choice: '{choice}'")
