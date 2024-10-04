@@ -101,7 +101,12 @@ def new_vault(filename: str) -> Vault:
 	# Check if the file can be created
 	open(filename, 'w').close()
 
-	master_password = getpass("Master Password: ")
+	master_password = getpass("\nSet Master Password: ")
+	re_entered_master_password = getpass("Retype Master Password: ")
+
+	if master_password != re_entered_master_password:
+		os.remove(filename)
+		raise ValueError("Sorry, master passwords do not match.")
 
 	vault = Vault(filename, master_password)
 	vault.store(data=[])
@@ -140,7 +145,7 @@ def open_vault(filename: str) -> Vault:
 	# Check if the file can be read
 	open(filename, 'r').close()
 
-	master_password = getpass("Master Password: ")
+	master_password = getpass("\nMaster Password: ")
 
 	vault = Vault(filename, master_password)
 	#~ vault.retrieve()
