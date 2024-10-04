@@ -41,17 +41,17 @@ def render_logo_and_menu(level: int=None) -> None:
 
 	if password_manager != None:
 		print("\tVault: {}{}{}".format(
-				Fore.LIGHTYELLOW_EX,
-				password_manager.vault.filename,
-				Fore.RESET))
-		print("\tEntries: {}{}{}".format(
-				Fore.CYAN,
-				len(password_manager.entries),
-				Fore.RESET), end=' ')
+			Fore.LIGHTYELLOW_EX,
+			os.path.abspath(password_manager.vault.filename),
+			Fore.RESET))
 		is_sync = password_manager.is_sync()
-		print("| Synchronized: {}{}{}".format(
+		print("\tSynchronized: {}{}{}".format(
 			[Fore.LIGHTRED_EX, Fore.LIGHTGREEN_EX][is_sync],
 			is_sync,
+			Fore.RESET), end=' ')
+		print("| Entries: {}{}{}".format(
+			Fore.CYAN,
+			len(password_manager.entries),
 			Fore.RESET))
 		print()
 
@@ -105,7 +105,6 @@ def new_vault(filename: str) -> Vault:
 	re_entered_master_password = getpass("Retype Master Password: ")
 
 	if master_password != re_entered_master_password:
-		os.remove(filename)
 		raise ValueError("Sorry, master passwords do not match.")
 
 	vault = Vault(filename, master_password)
@@ -122,9 +121,14 @@ def create_vault_menu() -> PasswordManager:
 	filename = input("Enter file in which to save the vault: ")
 
 	if os.path.isfile(filename):
-		print()
-		display_error_message(
-			FileExistsError(f"[Errno 17] file exists: '{filename}'"))
+
+		try:
+			# raise an exception: FileExistsError
+			open(filename, 'x').close()
+
+		except Exception as error:
+			print()
+			display_error_message(error)
 
 		choice = input("Overwrite (y/N)? ")
 
@@ -166,7 +170,7 @@ def import_vault_menu() -> PasswordManager:
 
 		except InvalidToken as error:
 			if not error.args:
-				error.args = ("Token is invalid or corrupted",)
+				error.args = ("Token is invalid or corrupted.",)
 
 			raise InvalidToken(error)
 
@@ -174,7 +178,7 @@ def import_vault_menu() -> PasswordManager:
 	open(filename).close()
 
 
-def create_entry() -> dict:
+def create_entry() -> None:
 	"""
 	Creates a new password entry.
 	"""
@@ -206,6 +210,7 @@ def create_entry() -> dict:
 	while True:
 		try:
 			notes.append(input("Add note : "))
+
 		except EOFError:
 			print()
 			break
@@ -213,7 +218,10 @@ def create_entry() -> dict:
 	entry['data']['notes'] = "\n".join(notes)
 	entry['meta']['last-update'] = time.strftime("%a %b %H:%M:%S %Z %Y")
 
-	return entry
+	choice = input("\nSave to password manager (Y/n)? ")
+
+	if choice.lower() not in ("n", "no"):
+		password_manager.add_entry(entry)
 
 
 def pause() -> None:
@@ -224,7 +232,7 @@ def pause() -> None:
 	getpass("\nPress Enter to continue ... ")
 
 
-def show_entries() -> None:
+def show_entries() -> None: #?
 	"""
 	Displays password manager entries.
 	"""
@@ -282,10 +290,7 @@ def password_manager_menu() -> None:
 	print()
 
 	if choice == "1":
-		entry = create_entry()
-		choice = input("\nSave to password manager (Y/n)? ")
-		if choice.lower() not in ("n", "no"):
-			password_manager.add_entry(entry)
+		create_entry()
 
 	elif choice == "2":
 		show_entries()
@@ -322,6 +327,7 @@ def display_menu() -> None:
 				pass
 
 			except KeyboardInterrupt:
+				print()
 				sys.exit(0)
 
 			except Exception as xerr:
