@@ -348,6 +348,34 @@ def update_entries() -> None:
 		password_manager.entries[index] = entry
 
 
+def change_master_password() -> None:
+	"""
+	Changes the master password.
+	"""
+
+	master_password = getpass("Set Master Password: ")
+	confirm_master_password = getpass("Retype Master Password: ")
+
+	if master_password == confirm_master_password:
+		password_manager.vault.master_password = master_password
+		print("\nMaster password changed successfuly!")
+		pause()
+
+	else:
+		raise ValueError("Sorry, master passwords do not match.")
+
+
+def sync_vault() -> None:
+	"""
+	Synchronizes the password manager's vault.
+	"""
+
+	print("Synchronizing the vault ... ", end='')
+	sys.stdout.flush()
+	password_manager.sync_vault()
+	print("\rVault synchronized successfully!")
+	pause()
+
 def password_manager_menu() -> None:
 	"""
 	Displays the password manager menu, allowing user to modify the vault.
@@ -365,9 +393,11 @@ def password_manager_menu() -> None:
 	elif choice == "3":
 		update_entries()
 
+	elif choice == "4":
+		change_master_password()
+
 	elif choice == "0":
-		print("Sync the vault ... ", end=''); sys.stdout.flush()
-		password_manager.sync_vault()
+		sync_vault()
 
 	else:
 		raise ValueError(f"Invalid choice: '{choice}'")

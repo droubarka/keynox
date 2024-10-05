@@ -22,7 +22,9 @@ class PasswordManager:
 		Calculates the sync fingerprint based on the current entries.
 		"""
 		entries = [str(sorted(entry.items())) for entry in self.entries]
-		sync_fingerprint = hashlib.sha256(''.join(entries).encode()).digest()
+		sync_fingerprint = hashlib.sha256(
+			self.vault.master_password.encode() + ''.join(entries).encode()
+		).digest()
 
 		return sync_fingerprint
 
