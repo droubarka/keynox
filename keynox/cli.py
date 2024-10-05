@@ -284,6 +284,7 @@ def show_entries() -> None: #?
 
 def update_entries() -> None:
 	"""
+	Updates an existing entry in the password manager.
 	"""
 
 	index = int(input("Entry id: "))
@@ -293,9 +294,9 @@ def update_entries() -> None:
 
 	if choice.lower() == "r":
 		password_manager.remove_entry_by_index(index)
-		print("Entry password removed successfuly!")
+		print("\nEntry password removed successfuly!")
 		pause()
-		return
+		return None
 
 	print()
 
@@ -343,7 +344,7 @@ def update_entries() -> None:
 	choice = input("\nSave to password manager (Y/n)? ")
 
 	if choice.lower() not in ("n", "no"):
-		entry['meta']['last-update'] = time.strftime("%a %b %H:%M:%S %Z %Y") #?
+		entry['meta']['last-update'] = time.strftime("%a %b %H:%M:%S %Z %Y")
 		password_manager.entries[index] = entry
 
 
