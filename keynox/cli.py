@@ -121,6 +121,7 @@ def create_vault_menu() -> PasswordManager:
 	filename = input("Enter file in which to save the vault: ")
 
 	if os.path.isfile(filename):
+		#? check if the file is keynox type
 
 		try:
 			# raise an exception: FileExistsError
@@ -281,6 +282,71 @@ def show_entries() -> None: #?
 		index += rows_per_page
 
 
+def update_entries() -> None:
+	"""
+	"""
+
+	index = int(input("Entry id: "))
+	entry = password_manager.entries[index].copy()
+
+	choice = input("Update or Remove (U/r)? ")
+
+	if choice.lower() == "r":
+		password_manager.remove_entry_by_index(index)
+		print("Entry password removed successfuly!")
+		pause()
+		return
+
+	print()
+
+	keys = ['username', 'url', 'name', 'category']
+	for key in keys:
+		old_value = entry['data'][key]
+		prompt = "{key} ({old_value}): ".format(
+			key=key.capitalize() if key != 'url' else key.upper(),
+			old_value=old_value or 'N/A'
+		)
+		new_value = input(prompt) or old_value
+		entry['data'][key] = new_value
+
+	choice = input("\nUpdate the password (y/N)? ")
+
+	if choice.lower() in ("y", "yes"):
+		choice = input("Generate password randomly (Y/n)? ")
+
+		if choice.lower() in ("n", "no"):
+			print()
+			password = getpass("Password: ")
+
+		else:
+			policy = {'digit': 1, 'lowercase': 1, 'uppercase': 1, 'special': 1} #?
+			password = genpass(32, policy) #?
+
+		entry['data']['password'] = password
+
+	choice = input("\nUpdate the notes (y/N)? ")
+
+	if choice.lower() in ("y", "yes"):
+		print("Enter your notes (press 'Ctrl+D' to finish):\n") #?
+
+		notes = []
+		while True:
+			try:
+				notes.append(input("Add note : "))
+
+			except EOFError:
+				print()
+				break
+
+		entry['data']['notes'] = "\n".join(notes)
+
+	choice = input("\nSave to password manager (Y/n)? ")
+
+	if choice.lower() not in ("n", "no"):
+		entry['meta']['last-update'] = time.strftime("%a %b %H:%M:%S %Z %Y") #?
+		password_manager.entries[index] = entry
+
+
 def password_manager_menu() -> None:
 	"""
 	Displays the password manager menu, allowing user to modify the vault.
@@ -295,8 +361,11 @@ def password_manager_menu() -> None:
 	elif choice == "2":
 		show_entries()
 
-	elif choice == "0": #?
-		print("Sync the vault ...")
+	elif choice == "3":
+		update_entries()
+
+	elif choice == "0":
+		print("Sync the vault ... ", end=''); sys.stdout.flush()
 		password_manager.sync_vault()
 
 	else:
