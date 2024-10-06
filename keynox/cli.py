@@ -20,13 +20,36 @@ from utils import genpass
 from vault import Vault, InvalidToken
 
 
-KEYNOX_LOGO_FILEPATH = './cli/keynox-logo.dat'
-MENU_FILEPATH_FORMAT = './cli/menu/lvl-{}.dat'
+PROGRAM_DIR = os.path.dirname(os.path.abspath(__file__))
+KEYNOX_LOGO_FILEPATH = f"{PROGRAM_DIR}/cli/keynox-logo.dat"
+MENU_FILEPATH_FORMAT = f"{PROGRAM_DIR}/cli/menu/lvl-{'{}'}.dat"
 
 password_manager = None
 
 
-def render_logo_and_menu(level: int=None) -> None:
+class Notification(Exception):
+	"""
+	Custom exception for notifications.
+	"""
+
+	def __init__(self, message: str=str()) -> None:
+		"""
+		Initializes a Notification object.
+		"""
+
+		self.message = message
+
+
+	def __str__(self) -> str:
+		"""
+		Returns the notification message as a string.
+		"""
+
+		return self.message
+
+
+
+def render_logo_and_menu(level: int=None) -> None: #?
 	"""
 	Renders the logo and menu files.
 	"""
@@ -73,7 +96,16 @@ def display_error_message(error: Exception) -> None:
 	sys.stderr.write(Fore.RESET)
 	print()
 
-	return None
+
+def display_notification_message(message: Exception) -> None:
+	"""
+	Displays a notification message.
+	"""
+
+	sys.stdout.write(Fore.LIGHTGREEN_EX)
+	sys.stdout.write(f"[+] {message}\n")
+	sys.stdout.write(Fore.RESET)
+	print()
 
 
 def main_menu() -> int:
@@ -93,6 +125,20 @@ def main_menu() -> int:
 		raise ValueError(f"Invalid choice: '{choice}'")
 
 
+def set_master_password() -> str:
+	"""
+	Sets and confirms a master password.
+	"""
+
+	master_password = getpass("\nSet Master Password: ")
+	confirm_master_password = getpass("Retype Master Password: ")
+
+	if master_password != confirm_master_password:
+		raise ValueError("Sorry, master passwords do not match.")
+
+	return master_password
+
+
 def new_vault(filename: str) -> Vault:
 	"""
 	Creates a new vault with given filename.
@@ -101,11 +147,11 @@ def new_vault(filename: str) -> Vault:
 	# Check if the file can be created
 	open(filename, 'w').close()
 
-	master_password = getpass("\nSet Master Password: ")
-	re_entered_master_password = getpass("Retype Master Password: ")
-
-	if master_password != re_entered_master_password:
-		raise ValueError("Sorry, master passwords do not match.")
+	master_password = set_master_password()
+	print("\n{}Creating secure vault ... {}".format(
+		Fore.LIGHTYELLOW_EX,
+		Fore.RESET), end='') #?
+	sys.stdout.flush()
 
 	vault = Vault(filename, master_password)
 	vault.store(data=[])
@@ -151,6 +197,10 @@ def open_vault(filename: str) -> Vault:
 	open(filename, 'r').close()
 
 	master_password = getpass("\nMaster Password: ")
+	print("\n{}Importing the secure vault ... {}".format(
+		Fore.LIGHTYELLOW_EX,
+		Fore.RESET), end='') #?
+	sys.stdout.flush()
 
 	vault = Vault(filename, master_password)
 	#~ vault.retrieve()
@@ -223,6 +273,7 @@ def create_entry() -> None:
 
 	if choice.lower() not in ("n", "no"):
 		password_manager.add_entry(entry)
+		raise Notification("Password entry created and saved successfully!")
 
 
 def pause() -> None:
@@ -243,8 +294,7 @@ def show_entries() -> None: #?
 	len_entries = len(password_manager.entries)
 
 	if not len_entries:
-		print("No entries found.")
-		pause()
+		raise Notification("No entries found.")
 
 	rows_per_page = 32 #?
 	index = 0
@@ -278,7 +328,7 @@ def show_entries() -> None: #?
 		#! IndexError: list index out of range
 		#~ table.rows.clear()
 
-		pause()
+		getpass("\nPress Enter to continue ... ")
 		index += rows_per_page
 
 
@@ -294,9 +344,7 @@ def update_entries() -> None:
 
 	if choice.lower() == "r":
 		password_manager.remove_entry_by_index(index)
-		print("\nEntry password removed successfuly!")
-		pause()
-		return None
+		raise Notification("Entry password removed successfuly!")
 
 	print()
 
@@ -353,16 +401,9 @@ def change_master_password() -> None:
 	Changes the master password.
 	"""
 
-	master_password = getpass("Set Master Password: ")
-	confirm_master_password = getpass("Retype Master Password: ")
+	password_manager.vault.master_password = set_master_password()
 
-	if master_password == confirm_master_password:
-		password_manager.vault.master_password = master_password
-		print("\nMaster password changed successfuly!")
-		pause()
-
-	else:
-		raise ValueError("Sorry, master passwords do not match.")
+	raise Notification("Master password changed successfuly!")
 
 
 def sync_vault() -> None:
@@ -370,11 +411,12 @@ def sync_vault() -> None:
 	Synchronizes the password manager's vault.
 	"""
 
-	print("Synchronizing the vault ... ", end='')
+	print("{}Synchronizing the vault ... {}".format(
+		Fore.LIGHTYELLOW_EX,
+		Fore.RESET), end='') #?
 	sys.stdout.flush()
 	password_manager.sync_vault()
-	print("\rVault synchronized successfully!")
-	pause()
+	raise Notification("Vault synchronized successfully!")
 
 def password_manager_menu() -> None:
 	"""
@@ -396,8 +438,15 @@ def password_manager_menu() -> None:
 	elif choice == "4":
 		change_master_password()
 
-	elif choice == "0":
+	elif choice == "5":
 		sync_vault()
+
+	elif choice == "0":
+		if not password_manager.is_sync():
+			print("\nSync the vault before exiting (Y/n)? ")
+
+		else:
+			pass
 
 	else:
 		raise ValueError(f"Invalid choice: '{choice}'")
@@ -411,13 +460,19 @@ def display_menu() -> None:
 	global password_manager
 
 	level = 0
-	error = None
+	xcept = None
 
 	while True:
 		render_logo_and_menu(level)
 
-		if error != None:
-			error = display_error_message(error)
+		if xcept != None:
+			if isinstance(xcept, Notification):
+				display_notification_message(xcept)
+
+			else:
+				display_error_message(xcept)
+
+			xcept = None
 
 		if level == 0:
 			try:
@@ -430,8 +485,8 @@ def display_menu() -> None:
 				print()
 				sys.exit(0)
 
-			except Exception as xerr:
-				error = xerr
+			except Exception as error:
+				xcept = error
 
 		elif level == 1:
 			try:
@@ -446,8 +501,8 @@ def display_menu() -> None:
 			except KeyboardInterrupt:
 				level = 0
 
-			except Exception as xerr:
-				error = xerr
+			except Exception as error:
+				xcept = error
 
 		elif level == 2:
 			try:
@@ -460,8 +515,8 @@ def display_menu() -> None:
 			except KeyboardInterrupt:
 				level = 0
 
-			except Exception as xerr:
-				error = xerr
+			except Exception as error:
+				xcept = error
 
 		elif level == 3:
 			try:
@@ -473,8 +528,8 @@ def display_menu() -> None:
 			except KeyboardInterrupt:
 				pass
 
-			except Exception as xerr:
-				error = xerr
+			except (Notification, Exception) as error:
+				xcept = error
 
 		else:
 			sys.exit(0)

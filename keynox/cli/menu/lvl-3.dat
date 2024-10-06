@@ -2,5 +2,6 @@
 	    2. Show password manager entries
 	    3. Update/Remove password entry
 	    4. Change the master password
+	    5. Sync the vault
 
-	    0. Sync the vault
+	    0. Exit
