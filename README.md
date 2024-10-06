@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 <div align="center">
-	<img alt="screenshot" src="images/screenshot-20240928-190040.png" />
+	<img alt="screenshot" src="images/screenshot-20241006-143809.png" />
 </div>
 
 # Keynox
