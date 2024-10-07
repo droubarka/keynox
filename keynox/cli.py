@@ -276,14 +276,6 @@ def create_entry() -> None:
 		raise Notification("Password entry created and saved successfully!")
 
 
-def pause() -> None:
-	"""
-	Pauses the program execution and waits for the Enter key press.
-	"""
-
-	getpass("\nPress Enter to continue ... ")
-
-
 def show_entries() -> None: #?
 	"""
 	Displays password manager entries.
@@ -418,6 +410,82 @@ def sync_vault() -> None:
 	password_manager.sync_vault()
 	raise Notification("Vault synchronized successfully!")
 
+
+def reveal_password(password: str) -> None:
+	"""
+	Displays password exposure warning and prompts user to confirm.
+	"""
+
+	os.system('cls' if os.name == 'nt' else 'clear')
+
+	console = Console()
+
+	console.print("Warning: Password Exposure", style="bold yellow")
+	console.print("""
+| You are about to reveal your password in plain text in the terminal,
+| which could put it at risk of being seen or stolen by others.
+| Be aware that anyone with access to your terminal or screen may be
+| able to see your password ...""")
+	console.print("\nSO ONLY PROCEED IN A SECURE AND TRUSTED ENVIRONMENT.", style="bold red underline")
+
+	choice = input("\nReveal the password (y/N)? ")
+
+	if choice.lower() in ("y", "yes"):
+		print("\nPassword:", password)
+		print()
+		for i in range(6):
+			print('\r', end='')
+			console.print(f"The password has been hide after {5-i} ...", style="bold yellow", end='')
+			time.sleep(1.)
+	else:
+		console.print('\nShatter your limitations and break free from password prison!', style="bold magenta")
+
+
+def show_entry() -> None:
+	"""
+	"""
+
+	index = 0 #? int(input("Entry index : "))
+	entry = password_manager.entries[index] #?
+
+	print("""\
+last-update : {}
+
+category    : {}
+name        : {}
+username    : {}
+url         : {}
+note (main) : {}
+""".format(
+		entry['meta']['last-update']          or 'N/A',
+		entry['data']['category']             or 'N/A',
+		entry['data']['name']                 or 'N/A',
+		entry['data']['username']             or 'N/A',
+		entry['data']['url']                  or 'N/A',
+		entry['data']['notes'].split('\n')[0] or 'N/A',
+	))
+
+	choice = input("Show all the notes (y/N)? ")
+
+	if choice.lower() in ("y", "yes"):
+		print('\n| '.join([''] + entry['data']['notes'].split('\n')))
+		print()
+
+	choice = input("Show the password (y/N)? ")
+
+	if choice.lower() in ("y", "yes"):
+		reveal_password(entry['data']['password'])
+		print()
+
+	choice = input("Copy the password to the clipboard (y/N)? ")
+
+	if choice.lower() in ("y", "yes"):
+		print("Warning ... ")
+
+	getpass("\nPause ... ")
+	pass
+
+
 def password_manager_menu() -> None:
 	"""
 	Displays the password manager menu, allowing user to modify the vault.
@@ -440,6 +508,9 @@ def password_manager_menu() -> None:
 
 	elif choice == "5":
 		sync_vault()
+
+	elif choice == "6":
+		show_entry()
 
 	elif choice == "0":
 		if not password_manager.is_sync():
