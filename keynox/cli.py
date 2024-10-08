@@ -435,8 +435,10 @@ def reveal_password(password: str) -> None:
 		print()
 		for i in range(6):
 			print('\r', end='')
-			console.print(f"The password has been hide after {5-i} ...", style="bold yellow", end='')
+			console.print(f"The password will be hidden after {5-i} ...", style="bold yellow", end='')
 			time.sleep(1.)
+		os.system('cls' if os.name == 'nt' else 'clear')
+
 	else:
 		console.print('\nShatter your limitations and break free from password prison!', style="bold magenta")
 
