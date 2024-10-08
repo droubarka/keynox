@@ -6,6 +6,7 @@ This program provides a command-line interface for managing passwords.
 """
 
 import os
+import pyperclip
 import sys
 import time
 
@@ -425,8 +426,9 @@ def reveal_password(password: str) -> None:
 | You are about to reveal your password in plain text in the terminal,
 | which could put it at risk of being seen or stolen by others.
 | Be aware that anyone with access to your terminal or screen may be
-| able to see your password ...""")
-	console.print("\nSO ONLY PROCEED IN A SECURE AND TRUSTED ENVIRONMENT.", style="bold red underline")
+| able to see your password ...
+""")
+	console.print("SO ONLY PROCEED IN A SECURE AND TRUSTED ENVIRONMENT.", style="bold red underline")
 
 	choice = input("\nReveal the password (y/N)? ")
 
@@ -437,6 +439,40 @@ def reveal_password(password: str) -> None:
 			print('\r', end='')
 			console.print(f"The password will be hidden after {5-i} ...", style="bold yellow", end='')
 			time.sleep(1.)
+		os.system('cls' if os.name == 'nt' else 'clear')
+
+	else:
+		console.print('\nShatter your limitations and break free from password prison!', style="bold magenta")
+
+def clip_password(password: str) -> None:
+	"""
+	Copy the given password to the clipboard and clear it after a certain timeout.
+	"""
+
+	os.system('cls' if os.name == 'nt' else 'clear')
+
+	console = Console()
+
+	console.print("Warning: Password Copying", style="bold yellow")
+	console.print("""
+| You are about to copy your password to the clipboard in plain text,
+| which could put it at risk of being accessed or stolen by others.
+| Be aware that anyone with access to your clipboard or system may be
+| able to retrieve your password ...
+""")
+	console.print("SO ONLY PROCEED IN A SECURE AND TRUSTED ENVIRONMENT.", style="bold red underline")
+
+	choice = input("\nCopy the password to the clipboard (y/N)? ")
+
+	if choice.lower() in ("y", "yes"):
+		pyperclip.copy(password)
+		print("\nPassword copied to clipboard.")
+		print()
+		for i in range(6):
+			print('\r', end='')
+			console.print(f"The password will be cleared after {5-i} ...", style="bold yellow", end='')
+			time.sleep(1.)
+		pyperclip.copy('')
 		os.system('cls' if os.name == 'nt' else 'clear')
 
 	else:
@@ -473,16 +509,18 @@ note (main) : {}
 		print('\n| '.join([''] + entry['data']['notes'].split('\n')))
 		print()
 
+	password = entry['data']['password']
+
 	choice = input("Show the password (y/N)? ")
 
 	if choice.lower() in ("y", "yes"):
-		reveal_password(entry['data']['password'])
+		reveal_password(password)
 		print()
 
 	choice = input("Copy the password to the clipboard (y/N)? ")
 
 	if choice.lower() in ("y", "yes"):
-		print("Warning ... ")
+		clip_password(password)
 
 	getpass("\nPause ... ")
 	pass
