@@ -1,0 +1,22 @@
+{
+	"data": {
+		"category": "example-category",
+		"name"    : "example-name",
+		"notes"   : "example-main-note\nexample-other-notes",
+		"password": "example-password",
+		"url"     : "example-url",
+		"username": "example-username"
+	},
+	"metadata": {
+		"create-time" : "example-2024-10-11T16:00:00:Z",
+		"last-update-overall": "example-2024-10-11T16:00:00:Z",
+		"last-update" : {
+			"category": "example-2024-10-11T16:00:00:Z",
+			"name"    : "example-2024-10-11T16:00:00:Z",
+			"notes"   : "example-2024-10-11T16:00:00:Z",
+			"password": "example-2024-10-11T16:00:00:Z",
+			"url"     : "example-2024-10-11T16:00:00:Z",
+			"username": "example-2024-10-11T16:00:00:Z"
+		}
+	}
+}
