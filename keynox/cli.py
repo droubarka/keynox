@@ -483,7 +483,7 @@ def show_entry() -> None:
 	"""
 	"""
 
-	index = 0 #? int(input("Entry index : "))
+	index = int(input("Entry index : "))
 	entry = password_manager.entries[index] #?
 
 	print("""\
